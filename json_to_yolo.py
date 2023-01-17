@@ -110,4 +110,4 @@ validation_path = "/".join([x for x in list(IMG_VALIDATION_PATH.parts[1:])])
 with open(Path("yolov5", "data", "config.yaml"), "w") as f:
     for type, path in zip(["path", "train", "val"], [datasets_path, train_path, validation_path]):
         f.write(f"{type}: {path}\n")
-    f.write("names:\n  0: vocal cords")
+    f.write("names:\n\t0: vocal cords")
