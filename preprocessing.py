@@ -27,14 +27,14 @@ if EXPORT_PATH.exists():
 EXPORT_PATH.mkdir()
 LABELS_EXPORT.mkdir()
 CONFIG_EXPORT.mkdir()
-# Copying images to the datasets foler
-shutil.copytree(IMAGES_IMPORT, IMAGES_EXPORT)
+IMAGES_EXPORT.mkdir()
 
 # Loading JSON
 with open(LABELS_IMPORT) as f:
     labels_dict = json.loads(f.read())
 
-# Extracting relevant values from the JSON and saving them as txt under the correct name
+# Extracting relevant values from the JSON and saving them as dictionary under the correct name
+labels = {} # labels[name] = (class, x, y, w, h)
 file_names = []
 for item in labels_dict:
     if len(item["annotations"][0]["result"]) > 0:
@@ -51,8 +51,10 @@ for item in labels_dict:
         width = frame_width / 100
         height = frame_height / 100
 
-        with open(LABELS_EXPORT.joinpath(f"{file_name}.txt"), "w") as f:
-            f.write(f"0 {center_x} {center_y} {width} {height}")
+        labels[file_name_full] = (0, center_x, center_y, width, height)
+
+        # with open(LABELS_EXPORT.joinpath(f"{file_name}.txt"), "w") as f:
+        #     f.write(f"0 {center_x} {center_y} {width} {height}")
 
         file_names.append(file_name_full)
     else:
@@ -70,14 +72,34 @@ random_file_names = np.array(file_names)
 shuffle(random_file_names)
 
 for i in range(K):
-    training_set = [str(IMAGES_EXPORT.joinpath(x)) for x in random_file_names[fold_number != i]]
-    validation_set = [str(IMAGES_EXPORT.joinpath(x)) for x in random_file_names[fold_number == i]]
+    FOLD_TRAINING = Path(f"fold{i}", "training")
+    FOLD_VALIDATION = Path(f"fold{i}", "validation")
+
+    IMAGES_EXPORT.joinpath(FOLD_TRAINING).mkdir(parents=True)
+    IMAGES_EXPORT.joinpath(FOLD_VALIDATION).mkdir(parents=True)
+    LABELS_EXPORT.joinpath(FOLD_TRAINING).mkdir(parents=True)
+    LABELS_EXPORT.joinpath(FOLD_VALIDATION).mkdir(parents=True)
+
+    img_training_set = [IMAGES_IMPORT.joinpath(x) for x in random_file_names[fold_number != i]]
+    img_validation_set = [IMAGES_IMPORT.joinpath(x) for x in random_file_names[fold_number == i]]
+
+    for file in img_training_set:
+        name = file.name
+        shutil.copy(file, IMAGES_EXPORT.joinpath(FOLD_TRAINING).joinpath(file.name))
+        with open(LABELS_EXPORT.joinpath(FOLD_TRAINING).joinpath(f"{file.name.split('.')[0]}.txt"), "w") as f:
+            f.write("0\t{}\t{}\t{}\t{}".format(labels[name][0], labels[name][1], labels[name][2], labels[name][3]))
+    for file in img_validation_set:
+        shutil.copy(file, IMAGES_EXPORT.joinpath(FOLD_VALIDATION).joinpath(file.name))
+        with open(LABELS_EXPORT.joinpath(FOLD_VALIDATION).joinpath(f"{file.name.split('.')[0]}.txt"), "w") as f:
+            f.write("0\t{}\t{}\t{}\t{}".format(labels[name][0], labels[name][1], labels[name][2], labels[name][3]))
+
     with open(CONFIG_EXPORT.joinpath(f"config_{i}.yaml"), "w") as f:
-        f.write(f"path: {EXPORT_PATH}\n")
-        f.write(f"train: [{', '.join(training_set)}]\n")
-        f.write(f"val: [{', '.join(validation_set)}]\n")
+        f.write(f"path: {EXPORT_PATH.absolute()}\n")
+        f.write(f"train: {IMAGES_EXPORT.joinpath(FOLD_TRAINING).relative_to(EXPORT_PATH)}\n")
+        f.write(f"val: {IMAGES_EXPORT.joinpath(FOLD_VALIDATION).relative_to(EXPORT_PATH)}\n")
         f.write(f"names:\n  0: vocal_cords")
 
+print(img_validation_set)
 # for i, name in enumerate(random_file_names):
 #     # Images
 #     old_path = Path(IMAGE_PATH, f"{name}.jpg")
