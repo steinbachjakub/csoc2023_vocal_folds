@@ -3,10 +3,6 @@ import json
 from random import shuffle
 import shutil
 import numpy as np
-from matplotlib import pyplot as plt
-import matplotlib.image as mpimg
-from matplotlib.patches import Rectangle
-from numpy.random import default_rng
 
 # Number of folds
 K = 5
