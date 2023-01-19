@@ -2,7 +2,6 @@ from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from pathlib import Path
-import os
 
 import torch
 
@@ -40,9 +39,15 @@ ax.legend([rect_original, rect_yolo], ["Original Bounding Box", "YOLO Object Det
 plt.subplots_adjust(top=1, bottom=0, left=0, right=1, wspace=0, hspace=0)
 plt.tight_layout()
 fig.savefig("comparison.png", bbox_inches='tight', transparent="True", pad_inches=0)
-result = model(img)
-result.show()
-plt.show()
+print("Original bounding box:\nxmin: {:.2f}, ymin: {:.2f}, xmax: {:.2f}, ymax: {:.2f}"
+      .format(rect_x, rect_y, rect_x + rect_width, rect_y + rect_height))
+print("YOLO bounding box:\nxmin: {:.2f}, ymin: {:.2f}, xmax: {:.2f}, ymax: {:.2f}"
+      .format(x_min, y_min, x_max, y_max))
+intersection = max(0, min(rect_x + rect_width, x_max) - max(rect_x, x_min)) * \
+    max(0, min(rect_y + rect_height, y_max) - max(rect_y, y_min))
+union = rect_width * rect_height + (x_max - x_min) * (y_max - y_min) - intersection
+iou = intersection / union
+print("IOU: {:.2%}".format(iou))
 
 
 
