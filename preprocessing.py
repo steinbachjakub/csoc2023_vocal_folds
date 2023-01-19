@@ -70,13 +70,13 @@ random_file_names = np.array(file_names)
 shuffle(random_file_names)
 
 for i in range(K):
-    training_set = [str(IMAGES_EXPORT.relative_to(EXPORT_PATH).joinpath(x)) for x in random_file_names[fold_number != i]]
-    validation_set = [str(IMAGES_EXPORT.relative_to(EXPORT_PATH).joinpath(x)) for x in random_file_names[fold_number == i]]
+    training_set = [str(IMAGES_EXPORT.joinpath(x)) for x in random_file_names[fold_number != i]]
+    validation_set = [str(IMAGES_EXPORT.joinpath(x)) for x in random_file_names[fold_number == i]]
     with open(CONFIG_EXPORT.joinpath(f"config_{i}.yaml"), "w") as f:
         f.write(f"path: {EXPORT_PATH}\n")
         f.write(f"train: [{', '.join(training_set)}]\n")
         f.write(f"val: [{', '.join(validation_set)}]\n")
-        f.write(f"names:\n\t0: vocal_cords")
+        f.write(f"names:\n  0: vocal_cords")
 
 # for i, name in enumerate(random_file_names):
 #     # Images
