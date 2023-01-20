@@ -36,7 +36,7 @@ with open(LABELS_IMPORT) as f:
 # Extracting relevant values from the JSON and saving them as dictionary under the correct name
 labels = {} # labels[name] = (class, x, y, w, h)
 file_names = []
-for item in labels_dict:
+for item in labels_dict[:1]:
     if len(item["annotations"][0]["result"]) > 0:
         img_width = item["annotations"][0]["result"][0]["original_width"]
         img_height = item["annotations"][0]["result"][0]["original_height"]
@@ -87,12 +87,12 @@ for i in range(K):
         name = file.name
         shutil.copy(file, IMAGES_EXPORT.joinpath(FOLD_TRAINING).joinpath(file.name))
         with open(LABELS_EXPORT.joinpath(FOLD_TRAINING).joinpath(f"{file.name.split('.')[0]}.txt"), "w") as f:
-            f.write("{}\t{}\t{}\t{}\t{}".format(labels[name][0], labels[name][1], labels[name][2], labels[name][3],
+            f.write("{} {} {} {} {}".format(labels[name][0], labels[name][1], labels[name][2], labels[name][3],
                                                labels[name][4]))
     for file in img_validation_set:
         shutil.copy(file, IMAGES_EXPORT.joinpath(FOLD_VALIDATION).joinpath(file.name))
         with open(LABELS_EXPORT.joinpath(FOLD_VALIDATION).joinpath(f"{file.name.split('.')[0]}.txt"), "w") as f:
-            f.write("{}\t{}\t{}\t{}\t{}".format(labels[name][0], labels[name][1], labels[name][2], labels[name][3],
+            f.write("{} {} {} {} {}".format(labels[name][0], labels[name][1], labels[name][2], labels[name][3],
                                                 labels[name][4]))
 
     with open(CONFIG_EXPORT.joinpath(f"config_{i}.yaml"), "w") as f:
