@@ -36,7 +36,7 @@ with open(LABELS_IMPORT) as f:
 # Extracting relevant values from the JSON and saving them as dictionary under the correct name
 labels = {} # labels[name] = (class, x, y, w, h)
 file_names = []
-for item in labels_dict[:1]:
+for item in labels_dict:
     if len(item["annotations"][0]["result"]) > 0:
         img_width = item["annotations"][0]["result"][0]["original_width"]
         img_height = item["annotations"][0]["result"][0]["original_height"]
