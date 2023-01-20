@@ -90,6 +90,7 @@ for i in range(K):
             f.write("{} {} {} {} {}".format(labels[name][0], labels[name][1], labels[name][2], labels[name][3],
                                                labels[name][4]))
     for file in img_validation_set:
+        name = file.name
         shutil.copy(file, IMAGES_EXPORT.joinpath(FOLD_VALIDATION).joinpath(file.name))
         with open(LABELS_EXPORT.joinpath(FOLD_VALIDATION).joinpath(f"{file.name.split('.')[0]}.txt"), "w") as f:
             f.write("{} {} {} {} {}".format(labels[name][0], labels[name][1], labels[name][2], labels[name][3],
